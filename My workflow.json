@@ -1,0 +1,237 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are an AI assistant helping a business manage emails.\n\nAnalyze the email and return ONLY valid JSON in this format:\n\n{\n\"intent\": \"...\",\n\"needs_reply\": \"yes or no\",\n\"priority\": \"low medium or high\",\n\"suggested_reply\": \"...\"\n}\n\nEmail subject:\n{{ $json.subject }}\n\nEmail content:\n{{ $json.bodyPreview }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "ec53aabf-0673-4473-8793-e97a2a023ca0",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "HMI5MMnaGF4KQSFq",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4ec3e469-8418-40f0-8b15-cb919f2a2a8a",
+      "name": "Microsoft Outlook Trigger",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "CdAgehYierqrFwVZ",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\"needs_reply\": \"yes\"",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "dd0452f9-76ca-4aca-9d38-831e20829b47"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reply_needed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a3f171a5-cd8d-4dbd-a94a-d230bc5990d3",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\"needs_reply\": \"no\"",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_reply"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        0
+      ],
+      "id": "b1f24cc9-fc52-4e71-83e5-fd2ae4d37066",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Re: {{ $node[\"Microsoft Outlook Trigger\"].json.subject }}",
+        "bodyContent": "={{ JSON.parse($json.output[0].content[0].text).suggested_reply }}",
+        "additionalFields": {
+          "toRecipients": "={{ $node[\"Microsoft Outlook Trigger\"].json.from }}"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        976,
+        -96
+      ],
+      "id": "ab9ec2c6-01b5-4839-b517-ccf0d28d8fd4",
+      "name": "Create a draft",
+      "webhookId": "71f101b6-b3bd-445f-a8d5-f7e2e87e66d3",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "CdAgehYierqrFwVZ",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "7254011403",
+        "text": "=📩 AI Email Agent Notification  A reply draft has been generated.  Subject: {{ $json.subject }}  Check Outlook drafts to validate the response.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        -96
+      ],
+      "id": "4526f8da-e496-4cce-b4ab-3f816f475599",
+      "name": "Send a text message",
+      "webhookId": "f9603eeb-04c4-4a56-8ad9-52ecb45a4b34",
+      "credentials": {
+        "telegramApi": {
+          "id": "sAy0u3H2uO62DDSc",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "406e6532-29ba-4bfc-96ba-d83a13bdfbd3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d40e6d80e473f12eb8e9787963dafb58d4aead22a7059bb06cfd380d6067db92"
+  },
+  "id": "sYt9RbEGUS7Uw8qc",
+  "tags": []
+}
