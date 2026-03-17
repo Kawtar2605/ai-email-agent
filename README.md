@@ -6,6 +6,12 @@ L’objectif est de réduire les tâches répétitives liées aux emails (lectur
 
 ---
 
+## Objectif du projet
+
+Automatiser la gestion des emails professionnels grâce à un agent IA capable de comprendre, répondre et proposer des actions automatiquement.
+
+---
+
 ## Fonctionnement global
 
 Le système intercepte les emails entrants et exécute automatiquement les étapes suivantes :
