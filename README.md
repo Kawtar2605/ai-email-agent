@@ -19,10 +19,11 @@ Le système intercepte les emails entrants et exécute automatiquement les étap
 - Analyse du contenu du mail via un modèle LLM  
 - Détection de l’intention (prise de rendez-vous, demande d’information, etc.)  
 - Génération d’une réponse contextualisée et professionnelle  
-- Extraction des disponibilités depuis le calendrier Outlook  
-- Proposition automatique de créneaux pertinents  
+- Proposition automatique de créneaux de rendez-vous basée sur une logique définie  
 - Création d’un brouillon de réponse dans Outlook  
 - Notification de l’utilisateur via Telegram  
+
+> Une intégration dynamique avec le calendrier est actuellement en cours de développement afin de proposer des créneaux en temps réel basés sur les disponibilités réelles.
 
 ---
 
@@ -36,23 +37,22 @@ Détection des emails entrants en temps réel
 ### 2. Node IA (LLM)  
 Analyse du contenu du mail et génération d’une réponse adaptée  
 
-### 3. Microsoft Outlook – Calendar (Get Events)  
-Récupération des événements pour identifier les créneaux disponibles  
-
-### 4. Node JavaScript (traitement des données)  
-- Filtrage des événements  
-- Suppression des créneaux non exploitables  
+### 3. Node JavaScript (traitement des données)  
+- Développement d’une logique de proposition de créneaux  
 - Formatage des disponibilités  
-- Limitation à 2-3 créneaux pertinents  
+- Structuration des réponses  
 
-### 5. Second Node IA  
+### 4. Second Node IA  
 Injection des créneaux dans la réponse pour produire un message naturel et cohérent  
 
-### 6. Microsoft Outlook – Create Draft  
+### 5. Microsoft Outlook – Create Draft  
 Création automatique d’un brouillon prêt à être envoyé  
 
-### 7. Telegram Node  
+### 6. Telegram Node  
 Notification utilisateur en temps réel  
+
+### 7. (En cours) Microsoft Outlook Calendar Integration  
+Connexion au calendrier pour récupérer les disponibilités réelles et générer des créneaux dynamiques sans conflit  
 
 ---
 
@@ -96,7 +96,8 @@ Réponse générée automatiquement :
 
 ## Perspectives d’amélioration
 
-- Intégration Google Calendar  
+- Intégration complète du calendrier pour gestion dynamique des disponibilités  
+- Détection automatique des conflits de planning  
 - Gestion des fuseaux horaires  
 - Personnalisation avancée du ton  
 - Priorisation automatique plus fine  
