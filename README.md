@@ -12,6 +12,13 @@ Automatiser la gestion des emails professionnels grâce à un agent IA capable d
 
 ---
 
+## Demo
+
+Une démonstration vidéo du workflow est disponible ici :  
+[Accéder à la vidéo de démonstration] ( https://drive.google.com/file/d/1Sy7yiSJgjtvvzECqEOB4VA2wF3c0uJpk/view?usp=sharing )
+
+---
+
 ## Fonctionnement global
 
 Le système intercepte les emails entrants et exécute automatiquement les étapes suivantes :
